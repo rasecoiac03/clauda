@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -8,19 +9,43 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/rasecoiac03/clauda/pkg/config"
 )
 
+var timeSample = flag.Int("time-sample", 0, "time sample")
+var timeSampleUnit = flag.String("time-sample-unit", "", "time sample unit")
+var sortCount = flag.Bool("sort-count", false, "sort by count")
+
 var fileFolder = "files/"
 var files = []string{
-	"lotomania",
+	// "lotomania",
 	"lotofacil",
 }
 
+// ValidateTime type
+type ValidateTime func(hours float64, sample int) bool
+
+var validations = map[string]ValidateTime{
+	"year": func(hours float64, sample int) bool {
+		t := int(hours / 24 / 30 / 12)
+		return t < sample
+	},
+	"month": func(hours float64, sample int) bool {
+		t := int(hours / 24 / 30)
+		return t < sample
+	},
+	"day": func(hours float64, sample int) bool {
+		t := int(hours / 24)
+		return t < sample
+	},
+}
+
 func main() {
-	downloadFiles()
+	flag.Parse()
+	// downloadFiles()
 	readFiles()
 }
 
@@ -48,6 +73,7 @@ func executeCmd(message string, cmd *exec.Cmd) {
 }
 
 func readFiles() {
+	timeValidation := *timeSample != 0 && *timeSampleUnit != ""
 	for _, f := range files {
 		file, err := os.Open(fmt.Sprintf("%s%s.HTM", fileFolder, f))
 		if err != nil {
@@ -61,23 +87,49 @@ func readFiles() {
 		colIni := config.GetIntConfig(fmt.Sprintf("%s_col_ini", f))
 		colEnd := config.GetIntConfig(fmt.Sprintf("%s_col_end", f))
 
-		count := make(map[int]int64)
+		count := make(map[int]int)
 		doc.Find("table tr").Each(func(i int, s *goquery.Selection) {
+			var valid = !timeValidation
 			s.Find("td").Each(func(j int, td *goquery.Selection) {
-				if key, err := strconv.Atoi(td.Text()); err == nil && j >= colIni && j <= colEnd {
+				if timeValidation {
+					if t, err := time.Parse("02/01/2006", td.Text()); j == 1 && err == nil {
+						validation := validations[*timeSampleUnit]
+						valid = validation(time.Since(t).Hours(), *timeSample)
+					}
+				}
+				if key, err := strconv.Atoi(td.Text()); valid && err == nil && j >= colIni && j <= colEnd {
 					count[key]++
+					if j == colEnd {
+						valid = false
+					}
 				}
 			})
 		})
-		var keys []int
-		for k := range count {
-			keys = append(keys, k)
+		if *sortCount {
+			countLogSortingByValue(f, count)
+		} else {
+			countLogSortingByKey(f, count)
 		}
-		sort.Ints(keys)
+	}
+}
 
-		log.Printf("Results for %s\n", strings.ToUpper(f))
-		for _, k := range keys {
-			log.Printf("%d: %d\n", k, count[k])
-		}
+func countLogSortingByValue(file string, count map[int]int) {
+	countByValue := make(map[int]int)
+	for k, v := range count {
+		countByValue[v] = k
+	}
+	countLogSortingByKey(file, countByValue)
+}
+
+func countLogSortingByKey(file string, count map[int]int) {
+	var keys []int
+	for k := range count {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	log.Printf("Results for %s\n", strings.ToUpper(file))
+	for _, k := range keys {
+		log.Printf("%d: %d\n", k, count[k])
 	}
 }
