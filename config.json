@@ -1,4 +1,8 @@
 {
 	"lotomania_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_lotoma.zip",
-	"lotofacil_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_lotfac.zip"
+	"lotomania_col_ini" : "2",
+	"lotomania_col_end" : "21",
+	"lotofacil_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_lotfac.zip",
+	"lotofacil_col_ini" : "2",
+	"lotofacil_col_end" : "17"
 }

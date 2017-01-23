@@ -1,2 +1,4 @@
 package: github.com/rasecoiac03/clauda
-import: []
+import:
+- package: github.com/PuerkitoBio/goquery
+  version: ^1.0.2

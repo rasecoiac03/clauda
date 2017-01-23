@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 )
 
 // Configuration map from externalized file
@@ -19,6 +20,13 @@ func init() {
 	if err != nil {
 		fmt.Println("error:", err)
 	}
+}
+
+// GetIntConfig - get int property by key
+func GetIntConfig(key string) int {
+	value := GetConfig(key)
+	i, _ := strconv.Atoi(value)
+	return i
 }
 
 // GetConfig - get property by key
