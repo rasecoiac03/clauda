@@ -9,11 +9,14 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
 	"github.com/rasecoiac03/clauda/pkg/config"
 )
+
+var lock sync.Mutex
 
 var timeSample = flag.Int("time-sample", 0, "time sample")
 var timeSampleUnit = flag.String("time-sample-unit", "", "time sample unit")
@@ -22,7 +25,9 @@ var sortCount = flag.Bool("sort-count", false, "sort by count")
 var fileFolder = "files/"
 var files = []string{
 	// "lotomania",
-	"lotofacil",
+	// "megasena",
+	// "lotofacil",
+	"quina",
 }
 
 // ValidateTime type
@@ -45,7 +50,7 @@ var validations = map[string]ValidateTime{
 
 func main() {
 	flag.Parse()
-	// downloadFiles()
+	downloadFiles()
 	readFiles()
 }
 
@@ -98,7 +103,9 @@ func readFiles() {
 					}
 				}
 				if key, err := strconv.Atoi(td.Text()); valid && err == nil && j >= colIni && j <= colEnd {
+					lock.Lock()
 					count[key]++
+					lock.Unlock()
 					if j == colEnd {
 						valid = false
 					}
@@ -114,11 +121,26 @@ func readFiles() {
 }
 
 func countLogSortingByValue(file string, count map[int]int) {
-	countByValue := make(map[int]int)
+	countByValue := make(map[int][]int)
 	for k, v := range count {
-		countByValue[v] = k
+		if _, exists := countByValue[v]; exists {
+			countByValue[v] = append(countByValue[v], k)
+		} else {
+			countByValue[v] = []int{k}
+		}
 	}
-	countLogSortingByKey(file, countByValue)
+	var keys []int
+	for k := range countByValue {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+
+	log.Printf("Results for %s\n", strings.ToUpper(file))
+	for _, k := range keys {
+		for _, v := range countByValue[k] {
+			log.Printf("%d: %d\n", k, v)
+		}
+	}
 }
 
 func countLogSortingByKey(file string, count map[int]int) {

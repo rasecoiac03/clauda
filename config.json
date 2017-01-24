@@ -4,5 +4,11 @@
 	"lotomania_col_end" : "21",
 	"lotofacil_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_lotfac.zip",
 	"lotofacil_col_ini" : "2",
-	"lotofacil_col_end" : "17"
+	"lotofacil_col_end" : "17",
+	"megasena_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_megase.zip",
+	"megasena_col_ini" : "2",
+	"megasena_col_end" : "7",
+	"quina_file_enpoint" : "http://www1.caixa.gov.br/loterias/_arquivos/loterias/D_quina.zip",
+	"quina_col_ini" : "2",
+	"quina_col_end" : "6"
 }
