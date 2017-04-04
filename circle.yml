@@ -18,5 +18,4 @@ test:
     - ln -sf "$(pwd)" "$APP_PATH"
     - cd "$APP_PATH" && glide install
   override:
-    - make test
-    - make test-coveralls
+    - cd "$APP_PATH" && make test test-coveralls
