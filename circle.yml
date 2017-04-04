@@ -13,6 +13,10 @@ dependencies:
     - go get github.com/mattn/goveralls
 
 test:
+  pre:
+    - mkdir -p "$IMPORT_PATH"
+    - ln -sf "$(pwd)" "$APP_PATH"
+    - cd "$APP_PATH" && glide install
   override:
     - make test
     - make test-coveralls
