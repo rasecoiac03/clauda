@@ -1,0 +1,13 @@
+dependencies:
+  override:
+    - sudo add-apt-repository ppa:masterminds/glide -y
+    - sudo apt-get update
+    - sudo apt-get install glide -y
+    - glide install
+    - go get golang.org/x/tools/cmd/cover
+    - go get github.com/mattn/goveralls
+
+test:
+  override:
+    - make test
+    - make test-coveralls
