@@ -58,7 +58,7 @@ func downloadFiles() {
 	executeCmd("files removed", exec.Command("rm", "-rf", fileFolder))
 	executeCmd("files folder exists", exec.Command("mkdir", "-p", fileFolder))
 	for _, file := range files {
-		filePath := config.GetConfig(fmt.Sprintf("%s_file_enpoint", file))
+		filePath := config.GetConfig(fmt.Sprintf("%s_file_endpoint", file))
 		filePathParts := strings.Split(filePath, "/")
 		fileName := filePathParts[len(filePathParts)-1]
 		executeCmd(fmt.Sprintf("file downloaded: %s", fileName), exec.Command("wget", filePath))
